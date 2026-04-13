@@ -87,8 +87,8 @@ create_symposium_dir() {
 #
 compile_handler_app() {
     # Remove any previous install so osacompile does not error on existing path.
+    # Do NOT pre-create the bundle directory — osacompile builds the full structure itself.
     rm -rf "$APP_BUNDLE"
-    mkdir -p "$CONTENTS/MacOS"
 
     local script_tmp
     script_tmp="$(mktemp /tmp/symposium_handler_XXXXXX.applescript)"
