@@ -142,8 +142,14 @@ on run
 end run
 OSASCRIPT
 
-    osacompile -l AppleScript -o "$APP_BUNDLE" "$script_tmp"
+    # Compile to /tmp first — osacompile (-1750) refuses to write directly
+    # into non-standard directories on some macOS configs. Move after success.
+    local tmp_bundle
+    tmp_bundle="$(mktemp -d /tmp/SymposiumInstaller_XXXXXX)"
+    rm -rf "$tmp_bundle"  # mktemp -d created it; osacompile must create it itself
+    osacompile -l AppleScript -o "$tmp_bundle" "$script_tmp"
     rm -f "$script_tmp"
+    mv "$tmp_bundle" "$APP_BUNDLE"
 }
 
 # ── Step 3: Patch Info.plist ──────────────────────────────────────────────────
