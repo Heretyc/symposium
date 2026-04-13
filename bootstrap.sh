@@ -24,7 +24,8 @@ set -euo pipefail
 
 SYMPOSIUM_DIR="$HOME/.symposium"
 APP_NAME="SymposiumInstaller"
-APP_BUNDLE="$SYMPOSIUM_DIR/$APP_NAME.app"
+# ~/Applications/ is in Launch Services' automatic scan path; ~/.symposium/ is not.
+APP_BUNDLE="$HOME/Applications/$APP_NAME.app"
 CONTENTS="$APP_BUNDLE/Contents"
 PLIST="$CONTENTS/Info.plist"
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
@@ -71,6 +72,7 @@ check_dependencies() {
 
 create_symposium_dir() {
     mkdir -p "$SYMPOSIUM_DIR"
+    mkdir -p "$HOME/Applications"
 }
 
 # ── Step 2: Build the AppleScript handler app ─────────────────────────────────
