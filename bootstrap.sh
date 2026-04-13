@@ -88,12 +88,21 @@ create_symposium_dir() {
 # with a notification.
 #
 compile_handler_app() {
-    # Remove any previous install so osacompile does not error on existing path.
-    # Do NOT pre-create the bundle directory — osacompile builds the full structure itself.
+    # Clean up any previous install and any stale temp artifacts from failed runs.
     rm -rf "$APP_BUNDLE"
+    rm -f /tmp/symposium_handler_* 2>/dev/null || true
+    rm -rf /tmp/symposium_compile_* 2>/dev/null || true
 
-    local script_tmp
+    local script_tmp tmp_compile_dir tmp_bundle
     script_tmp="$(mktemp /tmp/symposium_handler_XXXXXX)"
+
+    # osacompile requires the output path to end in .app to produce a bundle.
+    # Without it, osacompile writes a flat compiled .scpt file and PlistBuddy
+    # fails because there is no Contents/ directory to patch.
+    # Compile into a temp dir in /tmp (avoids -1750 on non-standard paths),
+    # then move the finished bundle into place.
+    tmp_compile_dir="$(mktemp -d /tmp/symposium_compile_XXXXXX)"
+    tmp_bundle="$tmp_compile_dir/SymposiumInstaller.app"
 
     # shellcheck disable=SC2016
     cat > "$script_tmp" << 'OSASCRIPT'
@@ -144,14 +153,10 @@ on run
 end run
 OSASCRIPT
 
-    # Compile to /tmp first — osacompile (-1750) refuses to write directly
-    # into non-standard directories on some macOS configs. Move after success.
-    local tmp_bundle
-    tmp_bundle="$(mktemp -d /tmp/SymposiumInstaller_XXXXXX)"
-    rm -rf "$tmp_bundle"  # mktemp -d created it; osacompile must create it itself
     osacompile -l AppleScript -o "$tmp_bundle" "$script_tmp"
     rm -f "$script_tmp"
     mv "$tmp_bundle" "$APP_BUNDLE"
+    rm -rf "$tmp_compile_dir"
 }
 
 # ── Step 3: Patch Info.plist ──────────────────────────────────────────────────
