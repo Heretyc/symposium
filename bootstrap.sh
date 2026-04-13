@@ -91,7 +91,7 @@ compile_handler_app() {
     rm -rf "$APP_BUNDLE"
 
     local script_tmp
-    script_tmp="$(mktemp /tmp/symposium_handler_XXXXXX.applescript)"
+    script_tmp="$(mktemp /tmp/symposium_handler_XXXXXX)"
 
     # shellcheck disable=SC2016
     cat > "$script_tmp" << 'OSASCRIPT'
