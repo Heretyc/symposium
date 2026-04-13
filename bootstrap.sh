@@ -202,13 +202,12 @@ patch_plist() {
 
 # ── Step 4: Register with Launch Services ────────────────────────────────────
 #
-# -kill   : reset the LS database (Finder relaunches automatically — imperceptible)
-# -r      : recursive scan of the bundle
-# domain flags: register in all three domains so the association applies
-#               regardless of which user context opens the file
+# -r           : recursive scan of the bundle
+# domain flags : register in all three domains so the association applies
+#                regardless of which user context opens the file
 #
 register_with_launch_services() {
-    "$LSREGISTER" -kill -r -domain local -domain system -domain user "$APP_BUNDLE"
+    "$LSREGISTER" -r -domain local -domain system -domain user "$APP_BUNDLE"
 }
 
 # ── Step 5: Smoke-test the registration ──────────────────────────────────────
